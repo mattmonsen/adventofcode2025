@@ -2,15 +2,24 @@
 
 import re
 
-with open('day_3_input.txt', 'r') as f:
-    contents = f.read()
+first_capture = r"^(.*?)don\'t\(\)"
+middle_capture = r"do\(\)(.*)don\'t\(\)"
+last_capture = r"do\(.*?\)(?!.*do\(.*?\))(.*)$"
+extract_capture = r"mul\((\d+),(\d+)\)"
+full_capture = r"(?:^|do\(\))(.*?)(?=don't\(\)|$)"
+pattern = r"mul\(\d+,\d+\)|do\(\)|don't\(\)"
 
-result = re.findall("mul\((\d+),(\d+)\)", contents)
-print(result)
+matches = re.findall(pattern, open("day_3_input.txt").read())
 
 total = 0
-
-for match in re.finditer("mul\((\d+),(\d+)\)", contents):
-    total += int(match.group(1)) * int(match.group(2))
-
+flag = True
+for match in matches:
+    if match == "do()":
+        flag = True 
+    elif match == "don't()":
+        flag = False
+    else:
+        if flag:
+            x, y = map(int, match[4:-1].split(","))
+            total += x * y
 print(total)
