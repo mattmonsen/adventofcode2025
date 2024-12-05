@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
+    
+rules = open("day_5_rules.txt").read()
+prints = open("day_5_print.txt").read()
 
-#rules = open("day_5_rules.txt").read()
-#prints = open("day_5_print.txt").read()
-
-rules = open("rule.txt").read()
-prints = open("print.txt").read()
+#rules = open("rule.txt").read()
+#prints = open("print.txt").read()
 
 dictionary = {}
 
@@ -27,15 +27,23 @@ def check_rule(line):
             if check in dictionary[first]:
                 return check_rule(line[1:])
             else:
-#                print("didn't find a matching rule")
                 return False
-#    else:
-#        print(f"dictionary check failed on key {first}")
 
-#    print("got to end")
     return False
 
+def reorder_print(line):
+    while(not check_rule(line)):
+        for i in range(len(line) - 2, -1, -1):
+            if not check_rule(line[i:]):
+                a = line[i]
+                b = line[i + 1]
+                line[i] = b
+                line[i + 1] = a
+
+    return line
+
 pages = 0
+reorder_sum = 0
 
 for line in prints.splitlines():
     new_print = line.split(",")
@@ -44,5 +52,12 @@ for line in prints.splitlines():
         if length % 2 != 0:
             middle = length // 2
             pages += int(new_print[middle])
+    else:
+        reordered = reorder_print(new_print)
+        length = len(reordered)
+        if length % 2 != 0:
+            middle = length // 2
+            reorder_sum += int(reordered[middle])
 
 print(pages)
+print(reorder_sum)
