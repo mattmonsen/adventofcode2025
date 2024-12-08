@@ -51,6 +51,41 @@ def find_operations(nums, target):
         return None
     return backtrack(1, nums[0], [])
 
+def evaluate_expression(nums, ops):
+    """Evaluate the expression left-to-right given numbers and operators."""
+    result = nums[0]
+    for i in range(len(ops)):
+        if ops[i] == '+':
+            result += nums[i + 1]
+        elif ops[i] == '*':
+            result *= nums[i + 1]
+        elif ops[i] == '||':
+            result = int(str(result) + str(nums[i + 1]))
+    return result
+
+def find_valid_combination(nums, target):
+    """Find a valid combination of operators to match the target."""
+    from itertools import product
+    n = len(nums) - 1
+
+    # Generate all combinations of operators
+    for ops in product(['+', '*', '||'], repeat=n):
+        if evaluate_expression(nums, ops) == target:
+            return ops
+    return None
+
+# Example input
+nums = [6, 8, 6, 15]
+target = 7290
+
+# Find the solution
+solution = find_valid_combination(nums, target)
+if solution:
+    print(f"Valid combination of operators: {solution}")
+else:
+    print("No valid combination found.")
+
+
 # Example usage
 #nums = [3, 4, 5]
 #target = 17
@@ -71,8 +106,23 @@ for line in example.splitlines():
     operations = find_operations(nums, target)
     if operations:
         sum += target
-        print(f"Operations to reach {target}: {operations}")
-    else:
-        print("No solution found.")
+#        print(f"Operations to reach {target}: {operations}")
+#    else:
+#        print("No solution found.")
+
+print(f"Sum is: {sum}")
+
+sum = 0
+
+for line in example.splitlines():
+    target, nums = line.split(":")
+    nums = [int(x) for x in nums.lstrip().split(" ")]
+    target = int(target)
+    operations = find_valid_combination(nums, target)
+    if operations:
+        sum += target
+#        print(f"Operations to reach {target}: {operations}")
+#    else:
+#        print("No solution found.")
 
 print(f"Sum is: {sum}")
