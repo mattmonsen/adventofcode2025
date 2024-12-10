@@ -19,42 +19,42 @@ def find_trailheads(topographic_map):
                 trailheads.append((r, c))
     return trailheads
 
-# Perform BFS to find all reachable '9's from a trailhead
-def bfs_find_nines(topographic_map, start):
+# Function to calculate trail ratings using DFS with memoization
+def dfs_count_trails(topographic_map, position, memo):
     rows, cols = topographic_map.shape
-    queue = deque([start])
-    visited = set([start])
-    reachable_nines = set()
+    r, c = position
 
-    while queue:
-        r, c = queue.popleft()
+    # If this position is already computed, return its value
+    if position in memo:
+        return memo[position]
 
-        # If the current position is a '9', add it to the reachable set
-        if topographic_map[r, c] == 9:
-            reachable_nines.add((r, c))
+    # If this position is height 9, it's a valid endpoint
+    if topographic_map[r, c] == 9:
+        return 1
 
-        # Check all four possible directions (up, down, left, right)
-        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-            nr, nc = r + dr, c + dc
+    # Count distinct trails from this position
+    trails = 0
+    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < rows and 0 <= nc < cols:
+            # Ensure the path is valid (increasing by exactly 1)
+            if topographic_map[nr, nc] == topographic_map[r, c] + 1:
+                trails += dfs_count_trails(topographic_map, (nr, nc), memo)
 
-            if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) not in visited:
-                # Ensure the path is valid (increasing by exactly 1)
-                if topographic_map[nr, nc] == topographic_map[r, c] + 1:
-                    visited.add((nr, nc))
-                    queue.append((nr, nc))
+    # Store the result in memoization table
+    memo[position] = trails
+    return trails
 
-    return reachable_nines
-
-# Calculate the total score of all trailheads
-def calculate_total_score(topographic_map):
+# Calculate the total ratings of all trailheads
+def calculate_total_ratings(topographic_map):
     trailheads = find_trailheads(topographic_map)
-    total_score = 0
+    total_ratings = 0
+    memo = {}
 
     for trailhead in trailheads:
-        reachable_nines = bfs_find_nines(topographic_map, trailhead)
-        total_score += len(reachable_nines)
+        total_ratings += dfs_count_trails(topographic_map, trailhead, memo)
 
-    return total_score
+    return total_ratings
 
 # Example input map as a string (replace this with actual input for testing)
 input_map = """
@@ -68,9 +68,9 @@ input_map = """
 10456732
 """
 
-# Parse the input and calculate the total score
+# Parse the input and calculate the total ratings
 topographic_map = parse_map(content)
-total_score = calculate_total_score(topographic_map)
+total_ratings = calculate_total_ratings(topographic_map)
 
-print("Total Score:", total_score)
+print("Total Ratings:", total_ratings)
 
